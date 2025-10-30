@@ -1,0 +1,2776 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#003d99">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<title>סידור עבודה בייתי – חיפה</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #f6f7f9;
+  --card: #fff;
+  --line: #e6e8ec;
+  --ink: #0b1220;
+  --accent: #003d99;
+  --radius: 14px;
+  --shadow: 0 10px 25px rgba(16,24,40,.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Heebo', sans-serif;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+header {
+  background: linear-gradient(180deg, #fff 0%, #fbfcff 60%, #f6f7f9 100%);
+  border-bottom: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+header h1 {
+  margin: 0 0 10px 0;
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.tab-navigation {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 15px 0 10px 0;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: white;
+  border: 2px solid var(--line);
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 700;
+  color: #666;
+  border-radius: 10px;
+  transition: all 0.2s;
+  font-family: 'Heebo';
+  margin: 0;
+}
+
+.tab-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.tab-btn.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.header-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+header input[type="date"] {
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-family: 'Heebo';
+}
+
+main {
+  margin: 30px auto;
+  max-width: 1400px;
+  padding: 0 20px;
+}
+
+.main-layout {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+#scheduleArea {
+  flex: 2.5;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+#constraintsPanel {
+  flex: 1;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  max-height: 800px;
+  overflow-y: auto;
+  display: block;
+  position: sticky;
+  top: 180px;
+}
+
+#constraintsPanel h2 {
+  margin-top: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.constraint {
+  background: #fafbfc;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 10px;
+  text-align: right;
+}
+
+.constraint strong {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--accent);
+}
+
+.constraint-details {
+  font-size: 0.9rem;
+  margin: 3px 0;
+  color: #444;
+}
+
+.link-section {
+  background: linear-gradient(135deg, #003d99 0%, #002966 100%);
+  border-radius: var(--radius);
+  padding: 15px;
+  margin-bottom: 15px;
+  color: white;
+  text-align: center;
+}
+
+.link-section h3 {
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+}
+
+.link-button {
+  background: white;
+  color: #003d99;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 700;
+  transition: 0.2s;
+  cursor: pointer;
+  border: none;
+  font-family: 'Heebo';
+  margin: 5px;
+}
+
+.link-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,61,153,0.3);
+}
+
+.mobile-scroll-hint {
+  display: none;
+}
+
+@media(max-width: 600px) {
+  .mobile-scroll-hint {
+    display: block;
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+  }
+}
+
+.mobile-scroll-reminder {
+  display: none;
+}
+
+@media(max-width: 600px) {
+  .mobile-scroll-reminder {
+    display: block;
+    background: #fff9c4;
+    border: 2px solid #ffc107;
+    color: #856404;
+    padding: 8px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+}
+
+.table-container::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,61,153,0.8);
+  color: white;
+  width: 30px;
+  height: 60px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  z-index: 5;
+  pointer-events: none;
+  border-radius: 0 8px 8px 0;
+  animation: slideRight 1.5s infinite;
+}
+
+@keyframes slideRight {
+  0%, 100% { opacity: 0.6; transform: translateY(-50%) translateX(0); }
+  50% { opacity: 1; transform: translateY(-50%) translateX(5px); }
+}
+
+@media(max-width: 600px) {
+  .table-container::before {
+    display: flex;
+  }
+}
+
+.table-wrapper {
+  width: 100%;
+  position: relative;
+  display: block;
+}
+
+table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+  margin: 0;
+  display: table;
+}
+
+th, td {
+  border: 1px solid var(--line);
+  padding: 8px;
+  text-align: center;
+  min-width: 100px;
+  vertical-align: top;
+}
+
+th {
+  background: #fafbfc;
+  font-weight: 700;
+}
+
+td {
+  position: relative;
+  min-height: 80px;
+}
+
+td .slot {
+  border-radius: 10px;
+  padding: 10px 8px;
+  margin: 6px 0;
+  color: #000;
+  font-weight: 600;
+  font-family: 'Heebo';
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+  margin-inline: auto;
+  cursor: move;
+  transition: all 0.2s;
+  position: relative;
+  user-select: none;
+}
+
+/* סגנון מיוחד למתלמדים */
+td .slot.apprentice {
+  background: repeating-linear-gradient(
+    45deg,
+    #e0e0e0,
+    #e0e0e0 10px,
+    #d0d0d0 10px,
+    #d0d0d0 20px
+  ) !important;
+  border: 2px dashed #999 !important;
+  font-style: italic;
+}
+
+td .slot:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  cursor: grab;
+}
+
+td .slot:active {
+  cursor: grabbing;
+  opacity: 0.8;
+}
+
+td .slot.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+td.drag-over {
+  background: #e3f2fd;
+  border: 2px dashed #003d99;
+}
+
+td .slot .delete-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  font-size: 12px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: #d32f2f;
+  font-weight: bold;
+  z-index: 10;
+}
+
+td .slot .copy-btn {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  font-size: 10px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: #003d99;
+  font-weight: bold;
+  z-index: 10;
+}
+
+td .slot:hover .delete-btn,
+td .slot:hover .copy-btn {
+  display: flex;
+}
+
+td .slot span.name {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+td .slot span.role {
+  font-weight: 500;
+  font-size: 0.75rem;
+  opacity: 0.85;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+td .slot span.time {
+  font-weight: 500;
+  margin-top: 2px;
+  white-space: nowrap;
+  font-size: 0.85rem;
+}
+
+.warning {
+  color: #d32f2f;
+  font-size: 0.75rem;
+  margin-top: 2px;
+}
+
+button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-weight: 700;
+  cursor: pointer;
+  margin: 10px 5px;
+  transition: 0.2s;
+  font-family: 'Heebo';
+}
+button:hover {
+  opacity: 0.9; 
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0,61,153,0.3);
+}
+button:active {transform: translateY(0);}
+
+.refresh-btn {
+  background: #4caf50;
+  width: calc(100% - 20px);
+  margin: 10px;
+}
+
+/* שיפורים למובייל */
+@media(max-width: 900px) {
+  main { 
+    padding: 0 10px;
+  }
+  
+  .main-layout {
+    flex-direction: column;
+  }
+  
+  #constraintsPanel { 
+    order: -1;
+    position: relative;
+    top: 0;
+    max-height: none;
+    margin-bottom: 20px;
+  }
+  
+  .tab-btn {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+  
+  header h1 {
+    font-size: 1.5rem;
+  }
+  
+  header input[type="date"] {
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .header-controls button {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+@media(max-width: 600px) {
+  body {
+    padding: 0;
+  }
+  
+  header {
+    padding: 12px 8px;
+    position: relative;
+  }
+  
+  header h1 {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+  }
+  
+  .tab-navigation {
+    gap: 6px;
+    margin: 10px 0;
+  }
+  
+  .tab-btn {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    flex: 1;
+    min-width: 80px;
+  }
+  
+  .header-controls {
+    gap: 6px;
+    margin-top: 8px;
+  }
+  
+  .header-controls button {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+    flex: 1;
+    min-width: 70px;
+    margin: 2px;
+  }
+  
+  header input[type="date"] {
+    width: 100%;
+    max-width: none;
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+  
+  main {
+    margin: 10px auto;
+    padding: 0 5px;
+  }
+  
+  #scheduleArea, #constraintsPanel {
+    padding: 12px 8px;
+    border-radius: 10px;
+  }
+  
+  #constraintsPanel {
+    margin-bottom: 15px;
+  }
+  
+  .link-section {
+    padding: 12px;
+  }
+  
+  .link-section h3 {
+    font-size: 0.9rem;
+  }
+  
+  .link-button {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    margin: 3px;
+  }
+  
+  #employeeLink {
+    font-size: 0.7rem !important;
+    padding: 6px !important;
+  }
+  
+  .table-container {
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .table-wrapper {
+    display: block;
+    width: 100%;
+  }
+  
+  table {
+    font-size: 0.65rem;
+    min-width: 650px;
+    width: 650px;
+    display: table;
+    table-layout: fixed;
+  }
+  
+  th, td {
+    padding: 5px 2px;
+    min-width: 75px;
+    width: 80px;
+    font-size: 0.65rem;
+    max-width: 85px;
+  }
+  
+  th small {
+    font-size: 0.65rem;
+    display: block;
+  }
+  
+  td .slot {
+    padding: 6px 3px;
+    margin: 3px auto;
+    width: 95%;
+  }
+  
+  td .slot span.name {
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
+  
+  td .slot span.role {
+    font-size: 0.65rem;
+    line-height: 1.1;
+  }
+  
+  td .slot span.time {
+    font-size: 0.65rem;
+    line-height: 1.1;
+  }
+  
+  td .slot .delete-btn,
+  td .slot .copy-btn {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+    display: flex;
+  }
+  
+  button {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    margin: 6px 3px;
+  }
+  
+  .constraint {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+  
+  .constraint strong {
+    font-size: 0.95rem;
+  }
+  
+  .constraint-details {
+    font-size: 0.8rem;
+  }
+}
+
+@media(max-width: 400px) {
+  header h1 {
+    font-size: 1.1rem;
+  }
+  
+  .tab-btn {
+    padding: 8px 10px;
+    font-size: 0.75rem;
+  }
+  
+  .table-container {
+    border-radius: 6px;
+  }
+  
+  table {
+    font-size: 0.6rem;
+    min-width: 600px;
+    width: 600px;
+  }
+  
+  th, td {
+    padding: 4px 2px;
+    min-width: 70px;
+    width: 75px;
+    font-size: 0.6rem;
+  }
+  
+  td .slot span.name {
+    font-size: 0.7rem;
+  }
+  
+  td .slot span.time {
+    font-size: 0.6rem;
+  }
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
+}
+
+.modal-content {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 30px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  margin: auto;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  color: var(--accent);
+  font-size: 1.6rem;
+  line-height: 1.3;
+}
+
+.modal-content input, .modal-content select, .modal-content textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-family: 'Heebo';
+  box-sizing: border-box;
+  font-size: 15px;
+}
+
+.modal-content textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-buttons button {
+  flex: 1;
+  margin: 0;
+}
+
+.cancel-btn {
+  background: #757575;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-style: italic;
+}
+
+.alert-box {
+  position: fixed;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 500px;
+  width: 90%;
+}
+
+.alert {
+  padding: 12px 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  animation: slideDown 0.3s ease;
+  font-weight: 600;
+}
+
+.alert-success {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.alert-warning {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  color: #856404;
+}
+
+.alert-danger {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.stat-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 25px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  border: 2px solid var(--line);
+}
+
+.stat-card h3 {
+  font-size: 2.5rem;
+  color: var(--accent);
+  margin: 0 0 10px 0;
+  font-weight: 800;
+}
+
+.stat-card p {
+  color: #666;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.employee-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.employee-item {
+  background: #fafbfc;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.employee-item:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.employee-info {
+  flex: 1;
+  text-align: right;
+  min-width: 150px;
+}
+
+.employee-info strong {
+  display: block;
+  font-size: 1.1rem;
+  color: var(--accent);
+  margin-bottom: 5px;
+}
+
+.employee-info small {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.btn-success { background: #4caf50; }
+.btn-warning { background: #ff9800; }
+.btn-danger { background: #f44336; }
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(156, 39, 176, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(156, 39, 176, 0.8), 0 0 30px rgba(156, 39, 176, 0.6);
+  }
+}
+
+/* שיפורים למודאל במובייל */
+@media(max-width: 600px) {
+  .modal {
+    padding: 0 !important;
+    align-items: flex-start !important;
+  }
+  
+  .modal-content {
+    padding: 15px !important;
+    max-height: 100vh !important;
+    height: auto !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+  
+  .modal-content h3 {
+    font-size: 1.2rem !important;
+    text-align: center;
+  }
+  
+  .modal-content input,
+  .modal-content select,
+  .modal-content textarea {
+    padding: 10px 8px;
+    font-size: 16px;
+  }
+  
+  .modal-buttons {
+    flex-direction: column;
+  }
+  
+  .modal-buttons button {
+    width: 100%;
+    margin: 5px 0;
+  }
+  
+  .employee-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .employee-item > div:last-child {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .employee-item > div:last-child button {
+    flex: 1;
+    margin: 0;
+  }
+}
+</style>
+</head>
+<body>
+<div class="alert-box" id="alertBox"></div>
+
+<header>
+  <h1>סידור עבודה בייתי – חיפה</h1>
+  
+  <div class="tab-navigation">
+    <button class="tab-btn active" onclick="switchTab('schedule')">📅 סידור</button>
+    <button class="tab-btn" onclick="switchTab('stats')">📊 סטטיסטיקות</button>
+    <button class="tab-btn" onclick="switchTab('employees')">👥 עובדים</button>
+  </div>
+  
+  <div class="header-controls">
+    <input type="date" id="startDate" onchange="generateWeek()" />
+    <button onclick="copyWeekData()">📋 העתק שבוע</button>
+    <button onclick="copyDayModal()">📅 שכפול יום</button>
+    <button onclick="openTemplatesModal()">💾 תבניות</button>
+    <button onclick="searchEmployee()" title="חיפוש עובד">🔍 חיפוש</button>
+    <button onclick="openAIModal()" style="background: linear-gradient(135deg, #9c27b0, #7b1fa2); animation: glow 2s infinite;">🤖 בניית סידור AI</button>
+    <button onclick="exportBackup()" class="btn-success">💾 גיבוי</button>
+    <button onclick="sendToWhatsApp()" style="background: #25D366;">📱 שתף</button>
+  </div>
+</header>
+<main>
+  <div id="schedule" class="tab-content active">
+    <div class="main-layout">
+      <div id="constraintsPanel">
+        <h2>🧾 אילוצים לשבוע</h2>
+        <div class="link-section">
+          <h3>📋 קישור לעובדים</h3>
+          <div style="background: rgba(255,255,255,0.2); padding: 8px; border-radius: 8px; margin: 10px 0; font-size: 0.85rem; word-break: break-all; direction: ltr; font-family: monospace;" id="employeeLink"></div>
+          <button class="link-button" onclick="copyEmployeeLink()">📋 העתק קישור</button>
+          <button class="link-button" onclick="openEmployeePage()">👤 פתח טופס עובדים</button>
+        </div>
+        <div style="margin: 10px; padding: 10px; background: #fafbfc; border-radius: 10px; border: 1px solid var(--line);">
+          <label style="display: block; font-weight: 700; margin-bottom: 8px; text-align: right;">הצג אילוצים לשבוע:</label>
+          <input type="date" id="constraintWeekFilter" style="width: calc(100% - 20px); padding: 8px; border: 1px solid var(--line); border-radius: 8px; font-family: 'Heebo';" onchange="loadConstraints()" />
+        </div>
+        <button class="refresh-btn" onclick="loadConstraints()">🔄 רענן אילוצים</button>
+        <div id="constraintsList"></div>
+      </div>
+
+      <div id="scheduleArea">
+        <div class="mobile-scroll-hint">💡 החלק שמאלה/ימינה לראות את כל הימים</div>
+        <div class="table-container">
+          <div class="table-wrapper">
+            <table id="scheduleTable">
+              <thead id="tableHead"></thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="mobile-scroll-reminder">⬅️ החלק לצפייה בכל הימים ➡️</div>
+        <button onclick="exportPNG()">📸 יצוא ל־PNG</button>
+        <button onclick="exportToExcel()">📊 יצוא ל-Excel</button>
+        <button onclick="showSmartAlerts()">⚠️ התראות</button>
+        <button onclick="clearWeek()">🧹 איפוס שבוע</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="stats" class="tab-content">
+    <div class="card">
+      <h2>📊 סטטיסטיקות ודוח שכר</h2>
+      <div class="stats-grid" id="statsGrid"></div>
+      <div id="salaryReport" style="margin-top: 30px;"></div>
+    </div>
+  </div>
+
+  <div id="employees" class="tab-content">
+    <div class="card">
+      <h2>👥 ניהול עובדים</h2>
+      <p style="color: #666; margin-bottom: 20px;">עובדים שהוספת בסידור יופיעו כאן אוטומטית. תוכל לערוך את השכר לשעה שלהם.</p>
+      <div class="employee-list" id="employeesList"></div>
+    </div>
+  </div>
+</main>
+
+<div id="shiftModal" class="modal">
+  <div class="modal-content" style="max-width: 400px;">
+    <h3>הוספת משמרת</h3>
+    <input type="text" id="employeeName" placeholder="שם עובד" />
+    <input type="text" id="employeeRole" placeholder="תפקיד (אופציונלי)" style="font-size: 0.9rem; color: #666;" />
+    <div id="timeFieldsContainer">
+      <input type="time" id="startTime" value="08:00" />
+      <div style="text-align: right; margin: 10px 0;">
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px; background: #fff9c4; border-radius: 8px; border: 1px solid #ffc107;">
+          <input type="checkbox" id="isClosingShift" onchange="toggleClosingShift()" style="width: 20px; height: 20px; cursor: pointer;" />
+          <span style="font-weight: 600; flex: 1;">🌙 משמרת סגירה</span>
+        </label>
+      </div>
+      <input type="time" id="endTime" value="16:00" />
+    </div>
+    <div class="modal-buttons">
+      <button onclick="confirmShift()">אישור</button>
+      <button class="cancel-btn" onclick="closeModal()">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal שכפול יום -->
+<div id="copyDayModal" class="modal">
+  <div class="modal-content" style="max-width: 400px;">
+    <h3>📅 שכפול יום</h3>
+    <div class="form-group" style="margin-bottom: 15px; text-align: right;">
+      <label style="font-weight: 700; display: block; margin-bottom: 8px;">העתק מיום:</label>
+      <select id="copyFromDay" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 8px; font-family: 'Heebo';">
+        <option value="0">ראשון</option>
+        <option value="1">שני</option>
+        <option value="2">שלישי</option>
+        <option value="3">רביעי</option>
+        <option value="4">חמישי</option>
+        <option value="5">שישי</option>
+        <option value="6">שבת</option>
+      </select>
+    </div>
+    <div class="form-group" style="text-align: right;">
+      <label style="font-weight: 700; display: block; margin-bottom: 8px;">העתק ליום:</label>
+      <select id="copyToDay" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 8px; font-family: 'Heebo';">
+        <option value="0">ראשון</option>
+        <option value="1">שני</option>
+        <option value="2">שלישי</option>
+        <option value="3">רביעי</option>
+        <option value="4">חמישי</option>
+        <option value="5">שישי</option>
+        <option value="6">שבת</option>
+      </select>
+    </div>
+    <div class="modal-buttons">
+      <button onclick="executeCopyDay()">העתק</button>
+      <button class="cancel-btn" onclick="closeCopyDayModal()">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal תבניות -->
+<div id="templatesModal" class="modal">
+  <div class="modal-content">
+    <h3>💾 תבניות שבועיות</h3>
+    <div style="margin: 20px 0;">
+      <h4 style="text-align: right; margin-bottom: 10px;">שמור תבנית חדשה:</h4>
+      <div style="display: flex; gap: 10px;">
+        <input type="text" id="templateName" placeholder="שם התבנית (לדוגמא: שבוע רגיל)" style="flex: 1;" />
+        <button onclick="saveTemplate()" class="btn-success">💾 שמור</button>
+      </div>
+    </div>
+    <div style="margin: 20px 0;">
+      <h4 style="text-align: right; margin-bottom: 10px;">טען תבנית קיימת:</h4>
+      <div id="templatesList"></div>
+    </div>
+    <div class="modal-buttons">
+      <button class="cancel-btn" onclick="closeTemplatesModal()">סגור</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal מילוי אוטומטי AI -->
+<div id="aiModal" class="modal">
+  <div class="modal-content">
+    <h3 style="background: linear-gradient(135deg, #9c27b0, #7b1fa2); color: white; padding: 15px; border-radius: 10px; margin: -30px -30px 20px -30px;">🤖 בניית סידור אוטומטי</h3>
+    
+    <div style="background: #f3e5f5; border: 1px solid #9c27b0; border-radius: 10px; padding: 15px; margin: 15px 0;">
+      <strong>💡 איך זה עובד?</strong><br>
+      המערכת תבנה סידור אוטומטי לפי האילוצים שהעובדים הגישו, תוך שמירה על חלוקה הוגנת של משמרות ושעות.
+    </div>
+    
+    <div style="background: #fff9c4; border: 2px solid #ffc107; border-radius: 10px; padding: 15px; margin: 15px 0;">
+      <strong style="color: #856404;">⚠️ שים לב:</strong>
+      <ul style="text-align: right; margin: 10px 0; padding-right: 20px;">
+        <li>המערכת תמחק את הסידור הנוכחי!</li>
+        <li>מומלץ לשמור גיבוי לפני</li>
+        <li>אפשר לערוך את הסידור אחר כך</li>
+      </ul>
+    </div>
+    
+    <div style="margin: 20px 0; text-align: right;">
+      <label style="font-weight: 700; display: block; margin-bottom: 10px;">עובדים לכלול בסידור:</label>
+      <div id="aiEmployeesList" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; padding: 10px;">
+        <!-- יתמלא דינמית -->
+      </div>
+    </div>
+    
+    <div style="margin: 15px 0;">
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+        <input type="checkbox" id="aiRespectConstraints" checked style="width: 20px; height: 20px;" />
+        <span>כבד את אילוצי העובדים</span>
+      </label>
+    </div>
+    
+    <div style="margin: 15px 0;">
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+        <input type="checkbox" id="aiBalanceHours" checked style="width: 20px; height: 20px;" />
+        <span>איזן שעות בין עובדים</span>
+      </label>
+    </div>
+    
+    <div class="modal-buttons">
+      <button onclick="generateAISchedule()" style="background: linear-gradient(135deg, #9c27b0, #7b1fa2);">🤖 בנה סידור</button>
+      <button class="cancel-btn" onclick="closeAIModal()">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal חיפוש -->
+<div id="searchModal" class="modal">
+  <div class="modal-content" style="max-width: 500px;">
+    <h3>🔍 חיפוש עובד</h3>
+    <div style="margin: 15px 0;">
+      <input type="text" id="searchInput" placeholder="הקלד שם עובד..." onkeyup="performSearch()" autofocus style="width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-family: 'Heebo'; font-size: 16px;" />
+    </div>
+    <div id="searchResults" style="max-height: 300px; overflow-y: auto;"></div>
+    <div class="modal-buttons">
+      <button class="cancel-btn" onclick="closeSearchModal()">סגור</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================
+// 🔧 תיקונים קריטיים - BEITEA FIX v2.0
+// ============================================
+
+console.log('🔧 מפעיל תיקונים קריטיים...');
+
+// תיקון 1: בדיקת localStorage
+function isLocalStorageAvailable() {
+  try {
+    const test = '__test__';
+    localStorage.setItem(test, test);
+    localStorage.removeItem(test);
+    return true;
+  } catch(e) {
+    console.error('❌ localStorage לא זמין:', e);
+    return false;
+  }
+}
+
+function safeLocalStorageGet(key, defaultValue = null) {
+  if(!isLocalStorageAvailable()) return defaultValue;
+  try {
+    const value = localStorage.getItem(key);
+    // ✅ תיקון: אם הערך null או undefined, מחזירים את ברירת המחדל
+    if(value === null || value === undefined || value === 'null' || value === 'undefined') {
+      return defaultValue;
+    }
+    return value;
+  } catch(e) {
+    console.error('❌ שגיאה בקריאה:', e);
+    return defaultValue;
+  }
+}
+
+function safeLocalStorageSet(key, value) {
+  if(!isLocalStorageAvailable()) {
+    console.warn('⚠️ localStorage לא זמין');
+    showAlert('warning', 'אחסון לא זמין - שינויים לא יישמרו');
+    return false;
+  }
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch(e) {
+    if(e.name === 'QuotaExceededError') {
+      alert('⚠️ אחסון מלא! נקה נתונים ישנים');
+    }
+    console.error('❌ שגיאה בשמירה:', e);
+    return false;
+  }
+}
+
+console.log('✅ פונקציות localStorage תוקנו');
+
+// ============================================
+// משתנים גלובליים
+// ============================================
+
+const days = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+const shifts = ['משמרת בוקר','התלמדות בוקר','ערב','התלמדות ערב','חופשים','חופשים התלמדות'];
+let colorMap = JSON.parse(safeLocalStorageGet('colorMap','{}'));
+let currentCell = null;
+let draggedElement = null;
+let copiedShift = null;
+
+// ============================================
+// פונקציות עזר
+// ============================================
+
+function generateColor(name){
+  if(!colorMap[name]){
+    const hue = Math.floor(name.split('').reduce((a,c)=>a+c.charCodeAt(0),0) % 360);
+    colorMap[name] = `hsl(${hue},70%,80%)`;
+    safeLocalStorageSet('colorMap',JSON.stringify(colorMap));
+  }
+  return colorMap[name];
+}
+
+// תיקון 2: calculateHours מתוקן
+function calculateHours(start, end){
+  // ✅ בדיקה תחילה אם המשתנים מוגדרים
+  if(!end || !start) {
+    console.warn('⚠️ חסר start או end');
+    return 0;
+  }
+  
+  // בדיקת חופש/סגירה
+  if(end === 'חופש') return 0;
+  if(end === 'סגירה' || (typeof end === 'string' && end.toLowerCase() === 'סגירה')) {
+    return 8;
+  }
+  
+  try {
+    const [sh, sm] = start.split(':').map(Number);
+    const [eh, em] = end.split(':').map(Number);
+    
+    if(isNaN(sh) || isNaN(sm) || isNaN(eh) || isNaN(em)) {
+      console.error('❌ פורמט זמן שגוי:', start, end);
+      return 0;
+    }
+    
+    let hours = (eh - sh) + (em - sm)/60;
+    if(hours < 0) hours += 24;
+    
+    return hours;
+  } catch(e) {
+    console.error('❌ שגיאה בחישוב:', e);
+    return 0;
+  }
+}
+
+console.log('✅ calculateHours תוקן');
+
+// תיקון 3: generateWeek מתוקן
+function generateWeek(){
+  try {
+    console.log('📊 יוצר טבלה...');
+    
+    const dateInput = document.getElementById('startDate');
+    if(!dateInput) {
+      throw new Error('אלמנט startDate לא נמצא!');
+    }
+    
+    const start = new Date(dateInput.value || new Date());
+    const headRow = document.getElementById('tableHead');
+    const body = document.getElementById('tableBody');
+    
+    if(!headRow || !body) {
+      throw new Error('אלמנטי טבלה לא נמצאו!');
+    }
+    
+    headRow.innerHTML = '<tr><th>משמרת</th>' + days.map((d,i)=>{
+      const currentDate = new Date(start);
+      currentDate.setDate(start.getDate()+i);
+      const dateStr = currentDate.toLocaleDateString('he-IL');
+      return `<th>${d}<br><small>${dateStr}</small></th>`;
+    }).join('') + '</tr>';
+    
+    body.innerHTML = shifts.map(s=>{
+      return `<tr><td>${s}</td>` + days.map(()=>`<td ondblclick="openShiftModal(this)" ondrop="dropShift(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></td>`).join('') + '</tr>';
+    }).join('');
+    
+    loadData();
+    console.log('✅ טבלה נוצרה בהצלחה');
+    
+  } catch(e) {
+    console.error('❌ שגיאה ביצירת טבלה:', e);
+    alert('שגיאה: ' + e.message + '\n\nנסה לרענן את הדף (Ctrl+Shift+R)');
+  }
+}
+
+console.log('✅ generateWeek תוקן');
+
+function openShiftModal(td){
+  currentCell = td;
+  
+  const row = td.parentElement;
+  const rowIndex = row.rowIndex - 1;
+  const shiftType = shifts[rowIndex];
+  
+  const isVacation = shiftType === 'חופשים' || shiftType === 'חופשים התלמדות';
+  
+  document.getElementById('shiftModal').style.display = 'flex';
+  document.getElementById('employeeName').value = '';
+  document.getElementById('employeeRole').value = '';
+  document.getElementById('startTime').value = '08:00';
+  document.getElementById('endTime').value = '16:00';
+  document.getElementById('isClosingShift').checked = false;
+  document.getElementById('endTime').disabled = false;
+  
+  const timeContainer = document.getElementById('timeFieldsContainer');
+  if(isVacation) {
+    timeContainer.style.display = 'none';
+  } else {
+    timeContainer.style.display = 'block';
+  }
+  
+  document.getElementById('employeeName').focus();
+}
+
+function toggleClosingShift(){
+  const isClosing = document.getElementById('isClosingShift').checked;
+  const endTimeInput = document.getElementById('endTime');
+  
+  if(isClosing){
+    endTimeInput.disabled = true;
+    endTimeInput.style.opacity = '0.5';
+    endTimeInput.value = '';
+  } else {
+    endTimeInput.disabled = false;
+    endTimeInput.style.opacity = '1';
+    endTimeInput.value = '16:00';
+  }
+}
+
+function closeModal(){
+  document.getElementById('shiftModal').style.display = 'none';
+  currentCell = null;
+}
+
+function confirmShift(){
+  const name = document.getElementById('employeeName').value.trim();
+  const role = document.getElementById('employeeRole').value.trim();
+  const startTime = document.getElementById('startTime').value;
+  const endTimeInput = document.getElementById('endTime').value;
+  const isClosing = document.getElementById('isClosingShift')?.checked;
+  
+  if(!name){
+    alert('יש להזין שם עובד');
+    return;
+  }
+  
+  const row = currentCell.parentElement;
+  const rowIndex = row.rowIndex - 1;
+  const shiftType = shifts[rowIndex];
+  const isVacation = shiftType === 'חופשים' || shiftType === 'חופשים התלמדות';
+  
+  let endTime;
+  if(isVacation) {
+    endTime = 'חופש';
+  } else if(isClosing){
+    endTime = 'סגירה';
+  } else {
+    if(!startTime || !endTimeInput){
+      alert('יש להזין שעת התחלה וסיום או לסמן "משמרת סגירה"');
+      return;
+    }
+    endTime = endTimeInput;
+  }
+  
+  const isApprentice = shiftType === 'התלמדות בוקר' || shiftType === 'התלמדות ערב';
+  
+  addShiftToCell(currentCell, name, role, startTime || '', endTime, isApprentice);
+  closeModal();
+  saveData();
+}
+
+function addShiftToCell(td, name, role, startTime, endTime, isApprentice = false){
+  const employees = JSON.parse(safeLocalStorageGet('employees', '{}'));
+  if(!employees[name]){
+    employees[name] = { rate: 0, addedAuto: true };
+    safeLocalStorageSet('employees', JSON.stringify(employees));
+  }
+  
+  const color = isApprentice ? 'transparent' : generateColor(name);
+  
+  const slot = document.createElement('div');
+  slot.className = 'slot';
+  if(isApprentice) {
+    slot.classList.add('apprentice');
+  } else {
+    slot.style.background = color;
+  }
+  
+  slot.draggable = true;
+  slot.ondragstart = dragStart;
+  slot.onclick = () => editShift(slot, name, role, startTime, endTime);
+  
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'delete-btn';
+  deleteBtn.innerHTML = '×';
+  deleteBtn.onclick = (e) => {
+    e.stopPropagation();
+    if(confirm(`למחוק את המשמרת של ${name}?`)){
+      slot.remove();
+      saveData();
+      checkConflicts();
+    }
+  };
+  
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'copy-btn';
+  copyBtn.innerHTML = '📋';
+  copyBtn.onclick = (e) => {
+    e.stopPropagation();
+    copiedShift = {name, role, startTime, endTime, isApprentice};
+    showAlert('success', `משמרת של ${name} הועתקה!`);
+  };
+  
+  const roleHtml = role ? `<span class='role'>${role}</span>` : '';
+  
+  let timeDisplay = '';
+  if(endTime === 'חופש') {
+    timeDisplay = 'חופש';
+  } else if(startTime && endTime) {
+    timeDisplay = `${startTime} - ${endTime}`;
+  }
+  
+  slot.innerHTML=`<span class='name'>${name}</span>${roleHtml}${timeDisplay ? `<span class='time'>${timeDisplay}</span>` : ''}`;
+  slot.appendChild(copyBtn);
+  slot.appendChild(deleteBtn);
+  td.appendChild(slot);
+  checkConflicts();
+}
+
+function editShift(slotDiv, oldName, oldRole, oldStart, oldEnd){
+  const name = prompt('שם עובד:', oldName);
+  if(!name) return;
+  
+  const role = prompt('תפקיד (אופציונלי):', oldRole || '');
+  
+  const startTime = prompt('שעת התחלה (HH:MM):', oldStart);
+  if(!startTime) return;
+  
+  const endTime = prompt('שעת סיום (HH:MM או "סגירה"):', oldEnd);
+  if(!endTime) return;
+  
+  if(startTime && endTime !== 'סגירה' && endTime !== 'חופש' && startTime >= endTime){
+    alert('שעת הסיום חייבת להיות אחרי שעת ההתחלה');
+    return;
+  }
+  
+  const isApprentice = slotDiv.classList.contains('apprentice');
+  
+  if(!isApprentice) {
+    const color = generateColor(name);
+    slotDiv.style.background = color;
+  }
+  
+  slotDiv.querySelector('.name').textContent = name;
+  if(role) {
+    let roleSpan = slotDiv.querySelector('.role');
+    if(!roleSpan) {
+      roleSpan = document.createElement('span');
+      roleSpan.className = 'role';
+      slotDiv.insertBefore(roleSpan, slotDiv.querySelector('.time'));
+    }
+    roleSpan.textContent = role;
+  }
+  
+  let timeDisplay = '';
+  if(endTime === 'חופש') {
+    timeDisplay = 'חופש';
+  } else {
+    timeDisplay = `${startTime} - ${endTime}`;
+  }
+  
+  slotDiv.querySelector('.time').textContent = timeDisplay;
+  
+  saveData();
+  checkConflicts();
+}
+
+function checkConflicts(){
+  const warnings = document.querySelectorAll('.warning');
+  warnings.forEach(w => w.remove());
+  
+  const table = document.getElementById('scheduleTable');
+  if(!table) return;
+  
+  const rows = table.querySelectorAll('tbody tr');
+  
+  rows.forEach(row => {
+    row.querySelectorAll('td').forEach((td, colIndex) => {
+      if(colIndex === 0) return;
+      
+      const slots = td.querySelectorAll('.slot');
+      const names = {};
+      
+      slots.forEach(slot => {
+        const nameEl = slot.querySelector('.name');
+        if(nameEl) {
+          const name = nameEl.textContent.trim();
+          names[name] = (names[name] || 0) + 1;
+        }
+      });
+      
+      Object.keys(names).forEach(name => {
+        if(names[name] > 1){
+          const warning = document.createElement('div');
+          warning.className = 'warning';
+          warning.textContent = `⚠️ ${name} מופיע ${names[name]} פעמים`;
+          td.appendChild(warning);
+        }
+      });
+    });
+  });
+}
+
+// תיקון 4: saveData מתוקן
+function saveData(){
+  try {
+    const data = {};
+    const table = document.getElementById('scheduleTable');
+    
+    if(!table) {
+      console.error('❌ טבלה לא נמצאה');
+      return;
+    }
+    
+    table.querySelectorAll('tbody tr').forEach((tr, r) => {
+      tr.querySelectorAll('td').forEach((td, c) => {
+        const slots = [...td.querySelectorAll('.slot')]
+          .map(slot => {
+            try {
+              const nameEl = slot.querySelector('.name');
+              const name = nameEl?.textContent?.trim();
+              if(!name) return null;
+              
+              const roleEl = slot.querySelector('.role');
+              const role = roleEl ? roleEl.textContent.trim() : '';
+              const timeEl = slot.querySelector('.time');
+              const time = timeEl ? timeEl.textContent.trim() : '';
+              const isApprentice = slot.classList.contains('apprentice');
+              
+              return {name, role, time, isApprentice};
+            } catch(e) {
+              console.error('❌ שגיאה בעיבוד slot:', e);
+              return null;
+            }
+          })
+          .filter(s => s !== null);
+        
+        if(slots.length > 0) {
+          if(!data[r]) data[r] = {};
+          data[r][c] = slots;
+        }
+      });
+    });
+    
+    const success = safeLocalStorageSet('scheduleData', JSON.stringify(data));
+    if(success) {
+      console.log('💾 נתונים נשמרו');
+    }
+    
+  } catch(e) {
+    console.error('❌ שגיאה בשמירה:', e);
+  }
+}
+
+console.log('✅ saveData תוקן');
+
+// תיקון 5: loadData מתוקן
+function loadData(){
+  try {
+    const dataStr = safeLocalStorageGet('scheduleData', '{}');
+    
+    // ✅ תיקון: בדיקה אם dataStr תקין
+    if(!dataStr || dataStr === 'null' || dataStr === 'undefined') {
+      console.log('ℹ️ אין נתונים שמורים - טבלה ריקה');
+      return;
+    }
+    
+    const data = JSON.parse(dataStr);
+    
+    // ✅ תיקון: בדיקה אם data תקין
+    if(!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+      console.log('ℹ️ אין נתונים לטעינה');
+      return;
+    }
+    
+    const table = document.getElementById('scheduleTable');
+    if(!table) {
+      console.error('❌ טבלה לא נמצאה');
+      return;
+    }
+    
+    Object.keys(data).forEach(r => {
+      // ✅ תיקון: בדיקה שdata[r] קיים
+      if(!data[r] || typeof data[r] !== 'object') {
+        console.warn(`נתונים לא תקינים לשורה ${r}`);
+        return;
+      }
+      
+      Object.keys(data[r]).forEach(c => {
+        const row = table.rows[r];
+        if(!row) {
+          console.warn(`שורה ${r} לא נמצאה`);
+          return;
+        }
+        
+        const td = row.cells[c];
+        if(!td) {
+          console.warn(`תא [${r}][${c}] לא נמצא`);
+          return;
+        }
+        
+        // ✅ תיקון: בדיקה שdata[r][c] הוא מערך
+        if(!Array.isArray(data[r][c])) {
+          console.warn(`נתונים לא תקינים בתא [${r}][${c}]`);
+          return;
+        }
+        
+        data[r][c].forEach(slot => {
+          try {
+            // ✅ תיקון: בדיקה ש-slot תקין
+            if(!slot || !slot.name) {
+              console.warn('slot לא תקין:', slot);
+              return;
+            }
+            
+            const [start, end] = slot.time ? slot.time.split(' - ') : ['', ''];
+            addShiftToCell(td, slot.name, slot.role || '', start, end, slot.isApprentice || false);
+          } catch(e) {
+            console.error('❌ שגיאה בהוספת משמרת:', e);
+          }
+        });
+      });
+    });
+    
+    checkConflicts();
+    console.log('✅ נתונים נטענו בהצלחה');
+    
+  } catch(e) {
+    console.error('❌ שגיאה בטעינה:', e);
+    console.log('ℹ️ ממשיך עם טבלה ריקה');
+  }
+}
+
+console.log('✅ loadData תוקן');
+
+function clearWeek(){
+  if(!confirm('האם למחוק את כל המשמרות?')) return;
+  safeLocalStorageSet('scheduleData', '{}');
+  document.querySelectorAll('#scheduleTable td .slot').forEach(slot=>slot.remove());
+  checkConflicts();
+}
+
+function dragStart(ev){
+  draggedElement = ev.target;
+  ev.target.classList.add('dragging');
+  ev.dataTransfer.effectAllowed = 'move';
+}
+
+function allowDrop(ev){
+  ev.preventDefault();
+  if(ev.currentTarget.tagName === 'TD'){
+    ev.currentTarget.classList.add('drag-over');
+  }
+}
+
+function dragLeave(ev){
+  ev.currentTarget.classList.remove('drag-over');
+}
+
+function dropShift(ev){
+  ev.preventDefault();
+  ev.currentTarget.classList.remove('drag-over');
+  
+  if(draggedElement && ev.currentTarget.tagName === 'TD'){
+    const nameEl = draggedElement.querySelector('.name');
+    const name = nameEl ? nameEl.textContent : '';
+    const roleElement = draggedElement.querySelector('.role');
+    const role = roleElement ? roleElement.textContent : '';
+    const timeElement = draggedElement.querySelector('.time');
+    const time = timeElement ? timeElement.textContent : '';
+    const [start, end] = time ? time.split(' - ') : ['', ''];
+    const isApprentice = draggedElement.classList.contains('apprentice');
+    
+    addShiftToCell(ev.currentTarget, name, role, start, end, isApprentice);
+    draggedElement.classList.remove('dragging');
+    draggedElement = null;
+    saveData();
+  }
+}
+
+function showAlert(type, message){
+  const alertBox = document.getElementById('alertBox');
+  const alert = document.createElement('div');
+  alert.className = `alert alert-${type}`;
+  alert.textContent = message;
+  alertBox.appendChild(alert);
+  setTimeout(() => alert.remove(), 4000);
+}
+
+function copyWeekData(){
+  const data = safeLocalStorageGet('scheduleData');
+  if(!data || data === '{}'){
+    showAlert('warning', 'אין נתונים להעתיק');
+    return;
+  }
+  
+  safeLocalStorageSet('copiedWeekData', data);
+  
+  if(confirm('השבוע הועתק! האם להדביק לשבוע הבא?')){
+    const dateInput = document.getElementById('startDate');
+    const current = new Date(dateInput.value);
+    current.setDate(current.getDate() + 7);
+    dateInput.value = current.toISOString().split('T')[0];
+    generateWeek();
+    
+    setTimeout(() => {
+      safeLocalStorageSet('scheduleData', safeLocalStorageGet('copiedWeekData'));
+      location.reload();
+    }, 300);
+  } else {
+    showAlert('success', 'השבוע נשמר! שנה תאריך ולחץ "הדבק שבוע"');
+  }
+}
+
+function exportBackup(){
+  const data = {
+    schedule: safeLocalStorageGet('scheduleData'),
+    employees: safeLocalStorageGet('employees', '{}'),
+    constraints: safeLocalStorageGet('employeeConstraints'),
+    colors: safeLocalStorageGet('colorMap'),
+    date: new Date().toISOString()
+  };
+  
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `backup_beitea_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showAlert('success', 'הגיבוי הורד בהצלחה! 💾');
+}
+
+function sendToWhatsApp(){
+  const area = document.getElementById('scheduleArea');
+  showAlert('success', 'מייצר תמונה...');
+  
+  const buttons = area.querySelectorAll('button');
+  const hints = area.querySelectorAll('.mobile-scroll-hint, .mobile-scroll-reminder');
+  buttons.forEach(btn => btn.style.display = 'none');
+  hints.forEach(hint => hint.style.display = 'none');
+  
+  const dateInput = document.getElementById('startDate');
+  const startDate = new Date(dateInput.value);
+  const endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 6);
+  
+  const startDay = startDate.getDate();
+  const startMonth = startDate.getMonth() + 1;
+  const endDay = endDate.getDate();
+  const endMonth = endDate.getMonth() + 1;
+  const year = startDate.getFullYear().toString().slice(-2);
+  
+  const dateRange = `${startDay}-${endDay}/${startMonth}/${year}`;
+  
+  const header = document.createElement('div');
+  header.id = 'export-header';
+  header.style.cssText = `
+    background: linear-gradient(135deg, #003d99 0%, #002966 100%);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    border-radius: 12px 12px 0 0;
+    margin-bottom: 15px;
+  `;
+  header.innerHTML = `
+    <h1 style="margin: 0 0 8px 0; font-size: 1.8rem; font-weight: 800;">סידור עבודה בייתי – חיפה</h1>
+    <div style="font-size: 1.2rem; font-weight: 600; opacity: 0.95;">${dateRange}</div>
+  `;
+  
+  area.insertBefore(header, area.firstChild);
+  
+  const originalBg = area.style.background;
+  area.style.background = 'white';
+  area.style.padding = '0';
+  
+  html2canvas(area, {scale: 2, backgroundColor: '#ffffff'}).then(canvas => {
+    canvas.toBlob(blob => {
+      const file = new File([blob], `sidur_${dateRange.replace(/\//g, '_')}.png`, {type: 'image/png'});
+      
+      header.remove();
+      buttons.forEach(btn => btn.style.display = '');
+      hints.forEach(hint => hint.style.display = '');
+      area.style.background = originalBg;
+      area.style.padding = '';
+      
+      if(navigator.share && navigator.canShare && navigator.canShare({files: [file]})){
+        navigator.share({
+          files: [file],
+          title: 'סידור עבודה BEITEA',
+          text: `סידור עבודה ${dateRange}`
+        }).then(() => {
+          showAlert('success', 'הסידור נשלח! 📱');
+        }).catch(() => {
+          downloadImage(canvas);
+        });
+      } else {
+        downloadImage(canvas);
+      }
+    });
+  }).catch(err => {
+    header.remove();
+    buttons.forEach(btn => btn.style.display = '');
+    hints.forEach(hint => hint.style.display = '');
+    area.style.background = originalBg;
+  });
+}
+
+function downloadImage(canvas){
+  const link = document.createElement('a');
+  link.download = 'sidur_beitea.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  
+  setTimeout(() => {
+    if(confirm('התמונה הורדה! האם לפתוח WhatsApp?')){
+      window.open('https://wa.me/', '_blank');
+    }
+  }, 500);
+}
+
+function switchTab(tabName){
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active');
+  event.target.classList.add('active');
+  
+  if(tabName === 'stats') updateStats();
+  if(tabName === 'employees') loadEmployees();
+}
+
+function updateStats(){
+  const employees = {};
+  const employeeData = JSON.parse(safeLocalStorageGet('employees', '{}'));
+  
+  document.querySelectorAll('.slot').forEach(slot => {
+    const nameEl = slot.querySelector('.name');
+    if(!nameEl) return;
+    
+    const name = nameEl.textContent;
+    const timeElement = slot.querySelector('.time');
+    if(!timeElement) return;
+    
+    const time = timeElement.textContent;
+    if(time === 'חופש') return;
+    
+    const [start, end] = time.split(' - ');
+    const hours = calculateHours(start, end);
+    
+    if(!employees[name]){
+      employees[name] = {
+        hours: 0,
+        shifts: 0,
+        salary: 0,
+        rate: employeeData[name]?.rate || 0
+      };
+    }
+    
+    employees[name].hours += hours;
+    employees[name].shifts += 1;
+    employees[name].salary = employees[name].hours * employees[name].rate;
+  });
+  
+  const statsGrid = document.getElementById('statsGrid');
+  const totalHours = Object.values(employees).reduce((sum, e) => sum + e.hours, 0);
+  const totalShifts = Object.values(employees).reduce((sum, e) => sum + e.shifts, 0);
+  const totalSalary = Object.values(employees).reduce((sum, e) => sum + e.salary, 0);
+  
+  statsGrid.innerHTML = `
+    <div class="stat-card">
+      <h3>${Object.keys(employees).length}</h3>
+      <p>עובדים פעילים</p>
+    </div>
+    <div class="stat-card">
+      <h3>${totalShifts}</h3>
+      <p>סה"כ משמרות</p>
+    </div>
+    <div class="stat-card">
+      <h3>${totalHours.toFixed(1)}</h3>
+      <p>סה"כ שעות</p>
+    </div>
+    <div class="stat-card">
+      <h3>₪${totalSalary.toLocaleString()}</h3>
+      <p>סה"כ שכר</p>
+    </div>
+  `;
+  
+  const salaryReport = document.getElementById('salaryReport');
+  if(Object.keys(employees).length === 0){
+    salaryReport.innerHTML = '<p style="text-align:center; color:#999;">אין נתונים להצגה</p>';
+    return;
+  }
+  
+  salaryReport.innerHTML = `
+    <h3 style="color: var(--accent); margin-bottom: 15px;">📋 דוח שכר מפורט</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="background: #fafbfc;">
+          <th style="padding: 12px; text-align: right; border: 1px solid var(--line);">עובד</th>
+          <th style="padding: 12px; text-align: center; border: 1px solid var(--line);">שעות</th>
+          <th style="padding: 12px; text-align: center; border: 1px solid var(--line);">משמרות</th>
+          <th style="padding: 12px; text-align: center; border: 1px solid var(--line);">שכר/שעה</th>
+          <th style="padding: 12px; text-align: center; border: 1px solid var(--line);">סה"כ שכר</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${Object.entries(employees).sort((a,b) => b[1].hours - a[1].hours).map(([name, data]) => `
+          <tr>
+            <td style="padding: 10px; border: 1px solid var(--line);"><strong>${name}</strong></td>
+            <td style="padding: 10px; text-align: center; border: 1px solid var(--line);">${data.hours.toFixed(1)}</td>
+            <td style="padding: 10px; text-align: center; border: 1px solid var(--line);">${data.shifts}</td>
+            <td style="padding: 10px; text-align: center; border: 1px solid var(--line);">₪${data.rate}</td>
+            <td style="padding: 10px; text-align: center; border: 1px solid var(--line); font-weight: bold;">₪${data.salary.toLocaleString()}</td>
+          </tr>
+        `).join('')}
+        <tr style="background: #f0f0f0; font-weight: bold;">
+          <td style="padding: 12px; border: 1px solid var(--line);">סה"כ</td>
+          <td style="padding: 12px; text-align: center; border: 1px solid var(--line);">${totalHours.toFixed(1)}</td>
+          <td style="padding: 12px; text-align: center; border: 1px solid var(--line);">${totalShifts}</td>
+          <td style="padding: 12px; text-align: center; border: 1px solid var(--line);">-</td>
+          <td style="padding: 12px; text-align: center; border: 1px solid var(--line);">₪${totalSalary.toLocaleString()}</td>
+        </tr>
+      </tbody>
+    </table>
+  `;
+}
+
+function loadEmployees(){
+  const employees = JSON.parse(safeLocalStorageGet('employees', '{}'));
+  const list = document.getElementById('employeesList');
+  
+  if(Object.keys(employees).length === 0){
+    list.innerHTML = '<p style="text-align:center; color:#999; padding: 40px;">אין עובדים עדיין.<br>הוסף משמרות בסידור והעובדים יופיעו כאן אוטומטית.</p>';
+    return;
+  }
+  
+  list.innerHTML = Object.entries(employees).map(([name, data]) => `
+    <div class="employee-item">
+      <div class="employee-info">
+        <strong>${name}</strong>
+        <small>שכר לשעה: ₪${data.rate || 0} ${data.addedAuto ? '(הוסף אוטומטית)' : ''}</small>
+      </div>
+      <div>
+        <button class="btn-warning" onclick="editEmployeeRate('${name}')">✏️ ערוך שכר</button>
+        <button class="btn-danger" onclick="deleteEmployee('${name}')">🗑️ מחק</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function editEmployeeRate(name){
+  const employees = JSON.parse(safeLocalStorageGet('employees', '{}'));
+  const currentRate = employees[name]?.rate || 0;
+  const newRate = prompt(`שכר לשעה חדש עבור ${name}:`, currentRate);
+  
+  if(newRate !== null){
+    employees[name] = { rate: parseFloat(newRate) || 0 };
+    safeLocalStorageSet('employees', JSON.stringify(employees));
+    loadEmployees();
+    showAlert('success', `שכר ${name} עודכן ל-₪${newRate}`);
+  }
+}
+
+function deleteEmployee(name){
+  if(confirm(`האם למחוק את ${name} מרשימת העובדים?\n(המשמרות בסידור לא יימחקו)`)){
+    const employees = JSON.parse(safeLocalStorageGet('employees', '{}'));
+    delete employees[name];
+    safeLocalStorageSet('employees', JSON.stringify(employees));
+    loadEmployees();
+    showAlert('success', `${name} נמחק מהרשימה`);
+  }
+}
+
+function exportPNG(){
+  const area = document.getElementById('scheduleArea');
+  
+  const buttons = area.querySelectorAll('button');
+  const hints = area.querySelectorAll('.mobile-scroll-hint, .mobile-scroll-reminder');
+  buttons.forEach(btn => btn.style.display = 'none');
+  hints.forEach(hint => hint.style.display = 'none');
+  
+  const dateInput = document.getElementById('startDate');
+  const startDate = new Date(dateInput.value);
+  const endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 6);
+  
+  const startDay = startDate.getDate();
+  const startMonth = startDate.getMonth() + 1;
+  const endDay = endDate.getDate();
+  const endMonth = endDate.getMonth() + 1;
+  const year = startDate.getFullYear().toString().slice(-2);
+  
+  const dateRange = `${startDay}-${endDay}/${startMonth}/${year}`;
+  
+  const header = document.createElement('div');
+  header.id = 'export-header';
+  header.style.cssText = `
+    background: linear-gradient(135deg, #003d99 0%, #002966 100%);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    border-radius: 12px 12px 0 0;
+    margin-bottom: 15px;
+  `;
+  header.innerHTML = `
+    <h1 style="margin: 0 0 8px 0; font-size: 1.8rem; font-weight: 800;">סידור עבודה בייתי – חיפה</h1>
+    <div style="font-size: 1.2rem; font-weight: 600; opacity: 0.95;">${dateRange}</div>
+  `;
+  
+  area.insertBefore(header, area.firstChild);
+  
+  const originalBg = area.style.background;
+  area.style.background = 'white';
+  area.style.padding = '0';
+  
+  html2canvas(area, {
+    scale: 2,
+    backgroundColor: '#ffffff',
+    logging: false,
+    useCORS: true
+  }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = `סידור_עבודה_${dateRange.replace(/\//g, '_')}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    
+    header.remove();
+    buttons.forEach(btn => btn.style.display = '');
+    hints.forEach(hint => hint.style.display = '');
+    area.style.background = originalBg;
+    area.style.padding = '';
+    
+    showAlert('success', 'התמונה הורדה בהצלחה! 📸');
+  }).catch(err => {
+    console.error('Error:', err);
+    header.remove();
+    buttons.forEach(btn => btn.style.display = '');
+    hints.forEach(hint => hint.style.display = '');
+    area.style.background = originalBg;
+    showAlert('danger', 'שגיאה ביצירת התמונה');
+  });
+}
+
+// ✅ תיקון 6: loadConstraints עם localStorage בטוח
+function loadConstraints(){
+  const allConstraints = JSON.parse(safeLocalStorageGet('employeeConstraints','[]'));
+  const list = document.getElementById('constraintsList');
+  const filterDate = document.getElementById('constraintWeekFilter').value;
+  
+  let constraints = allConstraints;
+  if(filterDate) {
+    constraints = allConstraints.filter(e => e.weekDate === filterDate);
+  }
+  
+  list.innerHTML = '';
+  
+  if(constraints.length === 0){
+    if(filterDate) {
+      const displayDate = new Date(filterDate).toLocaleDateString('he-IL');
+      list.innerHTML = `<div class="empty-state">אין אילוצים לשבוע ${displayDate}<br>העובדים צריכים למלא דרך הטופס.</div>`;
+    } else {
+      list.innerHTML = '<div class="empty-state">אין אילוצים עדיין.<br>בחר תאריך שבוע או המתן לעובדים למלא.</div>';
+    }
+    return;
+  }
+  
+  constraints.forEach((employee, index) => {
+    const div = document.createElement('div');
+    div.className = 'constraint';
+    
+    const weekDateDisplay = new Date(employee.weekDate).toLocaleDateString('he-IL');
+    
+    let constraintsHTML = '';
+    
+    if(employee.noConstraints) {
+      constraintsHTML = '<div class="constraint-details" style="color: #4caf50; font-weight: 600;">✅ אין אילוצים</div>';
+    } else {
+      employee.constraints.forEach((c, i) => {
+        constraintsHTML += `<div class="constraint-details">📌 ${c.day}: ${c.details}</div>`;
+      });
+    }
+    
+    div.innerHTML = `
+      <strong>${employee.name}</strong>
+      <div class="constraint-details" style="color: var(--accent); font-weight: 600;">📅 שבוע: ${weekDateDisplay}</div>
+      ${constraintsHTML}
+      <div style="margin-top:8px; font-size:0.75rem; color:#999;">
+        הוגש: ${new Date(employee.timestamp).toLocaleString('he-IL')}
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+// ✅ תיקון 7: לינק קבוע לעובדים
+function generateEmployeeLink() {
+  const currentUrl = window.location.href.split('?')[0];
+  const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
+  const linkWithFile = baseUrl + 'employees.html';
+  document.getElementById('employeeLink').textContent = linkWithFile;
+  return linkWithFile;
+}
+
+function copyEmployeeLink() {
+  const link = generateEmployeeLink();
+  navigator.clipboard.writeText(link).then(() => {
+    showAlert('success', '✅ הקישור הועתק! שלח אותו לעובדים');
+  }).catch(() => {
+    prompt('העתק את הקישור הזה:', link);
+  });
+}
+
+function openEmployeePage() {
+  window.open('employees.html', '_blank');
+}
+
+// פונקציות נוספות (שכפול יום, תבניות, AI, וכו')
+function copyDayModal() {
+  document.getElementById('copyDayModal').style.display = 'flex';
+  document.getElementById('copyFromDay').value = '0';
+  document.getElementById('copyToDay').value = '1';
+}
+
+function closeCopyDayModal() {
+  document.getElementById('copyDayModal').style.display = 'none';
+}
+
+function executeCopyDay() {
+  const fromDay = parseInt(document.getElementById('copyFromDay').value);
+  const toDay = parseInt(document.getElementById('copyToDay').value);
+  
+  if(fromDay === toDay) {
+    alert('יש לבחור ימים שונים');
+    return;
+  }
+  
+  const table = document.getElementById('scheduleTable');
+  const rows = table.querySelectorAll('tbody tr');
+  
+  let copiedCount = 0;
+  
+  rows.forEach((row, rowIndex) => {
+    const fromCell = row.cells[fromDay + 1];
+    const toCell = row.cells[toDay + 1];
+    
+    if(!fromCell || !toCell) return;
+    
+    toCell.querySelectorAll('.slot').forEach(slot => slot.remove());
+    
+    fromCell.querySelectorAll('.slot').forEach(slot => {
+      const nameEl = slot.querySelector('.name');
+      const name = nameEl ? nameEl.textContent : '';
+      const roleElement = slot.querySelector('.role');
+      const role = roleElement ? roleElement.textContent : '';
+      const timeElement = slot.querySelector('.time');
+      const time = timeElement ? timeElement.textContent : '';
+      const [start, end] = time ? time.split(' - ') : ['', ''];
+      const isApprentice = slot.classList.contains('apprentice');
+      
+      addShiftToCell(toCell, name, role, start, end, isApprentice);
+      copiedCount++;
+    });
+  });
+  
+  saveData();
+  closeCopyDayModal();
+  showAlert('success', `✅ הועתקו ${copiedCount} משמרות!`);
+}
+
+function openTemplatesModal() {
+  document.getElementById('templatesModal').style.display = 'flex';
+  loadTemplatesList();
+}
+
+function closeTemplatesModal() {
+  document.getElementById('templatesModal').style.display = 'none';
+}
+
+function saveTemplate() {
+  const name = document.getElementById('templateName').value.trim();
+  if(!name) {
+    alert('יש להזין שם לתבנית');
+    return;
+  }
+  
+  const currentSchedule = safeLocalStorageGet('scheduleData');
+  if(!currentSchedule || currentSchedule === '{}') {
+    alert('אין סידור לשמור');
+    return;
+  }
+  
+  const templates = JSON.parse(safeLocalStorageGet('scheduleTemplates', '[]'));
+  
+  templates.push({
+    name: name,
+    data: currentSchedule,
+    created: new Date().toISOString()
+  });
+  
+  safeLocalStorageSet('scheduleTemplates', JSON.stringify(templates));
+  document.getElementById('templateName').value = '';
+  loadTemplatesList();
+  showAlert('success', `💾 התבנית "${name}" נשמרה!`);
+}
+
+function loadTemplatesList() {
+  const templates = JSON.parse(safeLocalStorageGet('scheduleTemplates', '[]'));
+  const list = document.getElementById('templatesList');
+  
+  if(templates.length === 0) {
+    list.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">אין תבניות שמורות</p>';
+    return;
+  }
+  
+  list.innerHTML = templates.map((template, index) => `
+    <div style="background: #fafbfc; border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+      <div style="text-align: right; flex: 1;">
+        <strong style="display: block; color: var(--accent); margin-bottom: 5px;">${template.name}</strong>
+        <small style="color: #666;">נוצר: ${new Date(template.created).toLocaleDateString('he-IL')}</small>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button onclick="loadTemplate(${index})" class="btn-success" style="margin: 0; padding: 8px 12px;">טען</button>
+        <button onclick="deleteTemplate(${index})" class="btn-danger" style="margin: 0; padding: 8px 12px;">מחק</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function loadTemplate(index) {
+  const templates = JSON.parse(safeLocalStorageGet('scheduleTemplates', '[]'));
+  if(!templates[index]) return;
+  
+  if(!confirm(`להחליף את הסידור הנוכחי בתבנית "${templates[index].name}"?`)) return;
+  
+  safeLocalStorageSet('scheduleData', templates[index].data);
+  location.reload();
+}
+
+function deleteTemplate(index) {
+  const templates = JSON.parse(safeLocalStorageGet('scheduleTemplates', '[]'));
+  if(!templates[index]) return;
+  
+  if(!confirm(`למחוק את התבנית "${templates[index].name}"?`)) return;
+  
+  templates.splice(index, 1);
+  safeLocalStorageSet('scheduleTemplates', JSON.stringify(templates));
+  loadTemplatesList();
+  showAlert('success', 'התבנית נמחקה');
+}
+
+function searchEmployee() {
+  document.getElementById('searchModal').style.display = 'flex';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchResults').innerHTML = '';
+  setTimeout(() => document.getElementById('searchInput').focus(), 100);
+}
+
+function closeSearchModal() {
+  document.getElementById('searchModal').style.display = 'none';
+}
+
+function performSearch() {
+  const query = document.getElementById('searchInput').value.trim().toLowerCase();
+  const resultsDiv = document.getElementById('searchResults');
+  
+  if(query.length < 2) {
+    resultsDiv.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">הקלד לפחות 2 תווים</p>';
+    return;
+  }
+  
+  const table = document.getElementById('scheduleTable');
+  const results = [];
+  
+  table.querySelectorAll('.slot').forEach(slot => {
+    const cell = slot.closest('td');
+    const row = cell.parentElement;
+    const dayIndex = Array.from(row.cells).indexOf(cell) - 1;
+    const rowIndex = row.rowIndex - 1;
+    
+    const nameEl = slot.querySelector('.name');
+    if(!nameEl) return;
+    
+    const name = nameEl.textContent.toLowerCase();
+    if(name.includes(query)) {
+      const timeElement = slot.querySelector('.time');
+      const time = timeElement ? timeElement.textContent : '';
+      
+      results.push({
+        name: nameEl.textContent,
+        day: days[dayIndex],
+        shift: shifts[rowIndex],
+        time: time
+      });
+    }
+  });
+  
+  if(results.length === 0) {
+    resultsDiv.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">לא נמצאו תוצאות</p>';
+    return;
+  }
+  
+  resultsDiv.innerHTML = results.map(r => `
+    <div style="background: #f0f7ff; border: 1px solid #2196f3; border-radius: 8px; padding: 12px; margin-bottom: 10px; text-align: right;">
+      <div style="font-weight: 700; color: var(--accent); margin-bottom: 5px;">${r.name}</div>
+      <div style="font-size: 0.9rem; color: #666;">
+        📅 ${r.day} | ${r.shift}<br>
+        ⏰ ${r.time}
+      </div>
+    </div>
+  `).join('');
+}
+
+function openAIModal() {
+  document.getElementById('aiModal').style.display = 'flex';
+  loadAIEmployeesList();
+}
+
+function closeAIModal() {
+  document.getElementById('aiModal').style.display = 'none';
+}
+
+function loadAIEmployeesList() {
+  const employees = JSON.parse(safeLocalStorageGet('employees', '{}'));
+  const list = document.getElementById('aiEmployeesList');
+  
+  if(Object.keys(employees).length === 0) {
+    list.innerHTML = '<p style="text-align: center; color: #999;">אין עובדים במערכת</p>';
+    return;
+  }
+  
+  list.innerHTML = Object.keys(employees).map(name => `
+    <label style="display: flex; align-items: center; gap: 10px; padding: 8px; cursor: pointer; border-radius: 6px; transition: 0.2s;" 
+           onmouseover="this.style.background='#f0f0f0'" 
+           onmouseout="this.style.background='transparent'">
+      <input type="checkbox" class="ai-employee-checkbox" value="${name}" checked style="width: 18px; height: 18px;" />
+      <span style="flex: 1;">${name}</span>
+    </label>
+  `).join('');
+}
+
+function generateAISchedule() {
+  if(!confirm('⚠️ פעולה זו תמחק את הסידור הנוכחי!\n\nהאם להמשיך?')) return;
+  
+  const selectedEmployees = Array.from(document.querySelectorAll('.ai-employee-checkbox:checked'))
+    .map(cb => cb.value);
+  
+  if(selectedEmployees.length === 0) {
+    alert('יש לבחור לפחות עובד אחד');
+    return;
+  }
+  
+  const respectConstraints = document.getElementById('aiRespectConstraints').checked;
+  const balanceHours = document.getElementById('aiBalanceHours').checked;
+  
+  showAlert('success', '🤖 בונה סידור... אנא המתן');
+  closeAIModal();
+  
+  setTimeout(() => {
+    buildAISchedule(selectedEmployees, respectConstraints, balanceHours);
+  }, 500);
+}
+
+function buildAISchedule(employees, respectConstraints, balanceHours) {
+  document.querySelectorAll('.slot').forEach(slot => slot.remove());
+  
+  const dateInput = document.getElementById('startDate');
+  const startDate = dateInput.value;
+  const constraints = JSON.parse(safeLocalStorageGet('employeeConstraints', '[]'))
+    .filter(c => c.weekDate === startDate);
+  
+  const constraintsMap = {};
+  constraints.forEach(c => {
+    constraintsMap[c.name] = c.constraints.map(con => con.day);
+  });
+  
+  const table = document.getElementById('scheduleTable');
+  const rows = table.querySelectorAll('tbody tr');
+  
+  const hoursPerEmployee = {};
+  employees.forEach(emp => hoursPerEmployee[emp] = 0);
+  
+  const shiftsToFill = [
+    {rowIndex: 0, name: 'משמרת בוקר', hours: 8, days: [0,1,2,3,4]},
+    {rowIndex: 2, name: 'ערב', hours: 6, days: [0,1,2,3,4]},
+    {rowIndex: 0, name: 'משמרת בוקר', hours: 6, days: [5,6]},
+  ];
+  
+  shiftsToFill.forEach(shiftConfig => {
+    shiftConfig.days.forEach(dayIndex => {
+      const row = rows[shiftConfig.rowIndex];
+      if(!row) return;
+      
+      const cell = row.cells[dayIndex + 1];
+      if(!cell) return;
+      
+      let selectedEmployee = null;
+      let minHours = Infinity;
+      
+      for(const emp of employees) {
+        if(respectConstraints && constraintsMap[emp]) {
+          const dayName = days[dayIndex];
+          if(constraintsMap[emp].includes(dayName)) {
+            continue;
+          }
+        }
+        
+        if(balanceHours && hoursPerEmployee[emp] < minHours) {
+          minHours = hoursPerEmployee[emp];
+          selectedEmployee = emp;
+        } else if(!balanceHours) {
+          selectedEmployee = employees[Math.floor(Math.random() * employees.length)];
+          break;
+        }
+      }
+      
+      if(selectedEmployee) {
+        const startTime = shiftConfig.rowIndex === 0 ? '08:00' : '16:00';
+        const endTime = shiftConfig.rowIndex === 0 ? '16:00' : '22:00';
+        
+        addShiftToCell(cell, selectedEmployee, '', startTime, endTime, false);
+        hoursPerEmployee[selectedEmployee] += shiftConfig.hours;
+      }
+    });
+  });
+  
+  saveData();
+  showAlert('success', '✅ הסידור נבנה בהצלחה! אפשר לערוך לפי הצורך');
+  
+  setTimeout(() => {
+    let summary = 'סיכום שעות:\n\n';
+    Object.entries(hoursPerEmployee)
+      .sort((a,b) => b[1] - a[1])
+      .forEach(([emp, hours]) => {
+        summary += `${emp}: ${hours} שעות\n`;
+      });
+    alert(summary);
+  }, 1000);
+}
+
+function checkSmartAlerts() {
+  const employees = {};
+  const employeeData = JSON.parse(safeLocalStorageGet('employees', '{}'));
+  
+  document.querySelectorAll('.slot').forEach(slot => {
+    const nameEl = slot.querySelector('.name');
+    if(!nameEl) return;
+    
+    const name = nameEl.textContent;
+    const timeElement = slot.querySelector('.time');
+    if(!timeElement) return;
+    
+    const time = timeElement.textContent;
+    if(time === 'חופש') return;
+    
+    const [start, end] = time.split(' - ');
+    const hours = calculateHours(start, end);
+    
+    if(!employees[name]) employees[name] = { hours: 0, shifts: 0 };
+    employees[name].hours += hours;
+    employees[name].shifts += 1;
+  });
+  
+  const alerts = [];
+  
+  Object.entries(employees).forEach(([name, data]) => {
+    if(data.hours > 45) {
+      alerts.push({
+        type: 'warning',
+        message: `⚠️ ${name} עובר 45 שעות (${data.hours.toFixed(1)} שעות)`
+      });
+    }
+    
+    if(data.hours < 20 && data.hours > 0) {
+      alerts.push({
+        type: 'info',
+        message: `ℹ️ ${name} מתחת ל-20 שעות (${data.hours.toFixed(1)} שעות)`
+      });
+    }
+  });
+  
+  const table = document.getElementById('scheduleTable');
+  const rows = table.querySelectorAll('tbody tr');
+  
+  rows.forEach((row, rowIndex) => {
+    row.querySelectorAll('td').forEach((cell, colIndex) => {
+      if(colIndex === 0) return;
+      
+      const slots = cell.querySelectorAll('.slot');
+      if(slots.length === 0 && rowIndex < 4) {
+        alerts.push({
+          type: 'danger',
+          message: `🚨 משמרת ריקה: ${shifts[rowIndex]} ביום ${days[colIndex-1]}`
+        });
+      }
+    });
+  });
+  
+  return alerts;
+}
+
+function showSmartAlerts() {
+  const alerts = checkSmartAlerts();
+  
+  if(alerts.length === 0) {
+    showAlert('success', '✅ הכל תקין! אין התראות');
+    return;
+  }
+  
+  alerts.forEach((alert, index) => {
+    setTimeout(() => {
+      showAlert(alert.type, alert.message);
+    }, index * 300);
+  });
+}
+
+async function exportToExcel() {
+  showAlert('success', 'מייצא ל-Excel...');
+  
+  const data = [];
+  const table = document.getElementById('scheduleTable');
+  
+  const headers = ['משמרת', ...days];
+  data.push(headers);
+  
+  const rows = table.querySelectorAll('tbody tr');
+  rows.forEach((row, rowIndex) => {
+    const rowData = [shifts[rowIndex]];
+    
+    row.querySelectorAll('td').forEach((cell, colIndex) => {
+      if(colIndex === 0) return;
+      
+      const slots = cell.querySelectorAll('.slot');
+      const cellContent = Array.from(slots).map(slot => {
+        const nameEl = slot.querySelector('.name');
+        const name = nameEl ? nameEl.textContent : '';
+        const timeElement = slot.querySelector('.time');
+        const time = timeElement ? timeElement.textContent : '';
+        return `${name} ${time}`;
+      }).join('\n');
+      
+      rowData.push(cellContent || '');
+    });
+    
+    data.push(rowData);
+  });
+  
+  const csv = data.map(row => 
+    row.map(cell => `"${cell}"`).join(',')
+  ).join('\n');
+  
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  
+  const dateInput = document.getElementById('startDate');
+  const date = new Date(dateInput.value);
+  const fileName = `sidur_${date.toLocaleDateString('he-IL').replace(/\./g, '_')}.csv`;
+  
+  link.href = url;
+  link.download = fileName;
+  link.click();
+  
+  URL.revokeObjectURL(url);
+  showAlert('success', 'הקובץ הורד בהצלחה! 📊');
+}
+
+let autoSaveInterval;
+function startAutoSave() {
+  if(autoSaveInterval) clearInterval(autoSaveInterval);
+  
+  autoSaveInterval = setInterval(() => {
+    const data = {
+      schedule: safeLocalStorageGet('scheduleData'),
+      employees: safeLocalStorageGet('employees'),
+      constraints: safeLocalStorageGet('employeeConstraints'),
+      colors: safeLocalStorageGet('colorMap'),
+      timestamp: new Date().toISOString()
+    };
+    
+    safeLocalStorageSet('autoBackup', JSON.stringify(data));
+    console.log('💾 גיבוי אוטומטי:', new Date().toLocaleTimeString('he-IL'));
+  }, 5 * 60 * 1000);
+  
+  console.log('✅ גיבוי אוטומטי הופעל');
+}
+
+function enableSmartAlerts() {
+  const originalSaveData = window.saveData;
+  window.saveData = function() {
+    originalSaveData();
+    
+    const alerts = checkSmartAlerts();
+    
+    const critical = alerts.filter(a => a.type === 'danger' || a.type === 'warning');
+    if(critical.length > 0 && Math.random() < 0.3) {
+      setTimeout(() => {
+        showAlert(critical[0].type, critical[0].message);
+      }, 500);
+    }
+  };
+}
+
+function initNewFeatures() {
+  console.log('🚀 מאתחל פיצ\'רים חדשים...');
+  
+  startAutoSave();
+  enableSmartAlerts();
+  
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') {
+      closeCopyDayModal();
+      closeTemplatesModal();
+      closeAIModal();
+      closeSearchModal();
+    }
+  });
+  
+  ['copyDayModal', 'templatesModal', 'aiModal', 'searchModal'].forEach(modalId => {
+    const modal = document.getElementById(modalId);
+    if(modal) {
+      modal.addEventListener('click', (e) => {
+        if(e.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    }
+  });
+  
+  console.log('✅ פיצ\'רים חדשים הופעלו!');
+}
+
+// ✅ תיקון 8: אתחול משופר
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🚀 מאתחל את המערכת...');
+  
+  try {
+    if(!isLocalStorageAvailable()) {
+      alert('⚠️ אחסון לא זמין. השינויים לא יישמרו!');
+    }
+    
+    const requiredElements = ['startDate', 'scheduleTable', 'tableHead', 'tableBody'];
+    const missingElements = requiredElements.filter(id => !document.getElementById(id));
+    
+    if(missingElements.length > 0) {
+      console.error('❌ אלמנטים חסרים:', missingElements);
+      alert('❌ שגיאה באתחול: חסרים אלמנטים בדף');
+      return;
+    }
+    
+    const today = new Date();
+    const startDateInput = document.getElementById('startDate');
+    startDateInput.value = today.toISOString().split('T')[0];
+    
+    const nextSunday = new Date(today);
+    const daysUntilSunday = (7 - today.getDay()) % 7;
+    nextSunday.setDate(today.getDate() + (daysUntilSunday === 0 ? 7 : daysUntilSunday));
+    
+    const constraintFilter = document.getElementById('constraintWeekFilter');
+    if(constraintFilter) {
+      constraintFilter.value = nextSunday.toISOString().split('T')[0];
+    }
+    
+    generateWeek();
+    loadConstraints();
+    generateEmployeeLink();
+    initNewFeatures();
+    
+    console.log('✅ ✅ ✅ המערכת אותחלה בהצלחה!');
+    
+  } catch(e) {
+    console.error('❌ שגיאה קריטית באתחול:', e);
+    alert('❌ שגיאה באתחול המערכת: ' + e.message + '\n\nנסה לרענן את הדף (Ctrl+Shift+R)');
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape'){
+    closeModal();
+  }
+});
+
+document.getElementById('shiftModal').addEventListener('click', (e) => {
+  if(e.target.id === 'shiftModal'){
+    closeModal();
+  }
+});
+
+console.log('✅ ✅ ✅ כל התיקונים הותקנו בהצלחה!');
+console.log('');
+console.log('📝 מה תוקן:');
+console.log('1. ✅ localStorage - פונקציות בטוחות');
+console.log('2. ✅ calculateHours - בדיקת null/undefined');
+console.log('3. ✅ generateWeek - try-catch + בדיקות');
+console.log('4. ✅ saveData - try-catch + בדיקות');
+console.log('5. ✅ loadData - try-catch + בדיקות');
+console.log('6. ✅ loadConstraints - localStorage בטוח');
+console.log('7. ✅ לינק עובדים - קבוע (employees.html)');
+console.log('8. ✅ אתחול - בטוח ויציב');
+console.log('');
+console.log('🎯 הטבלה אמורה לעבוד עכשיו!');
+console.log('🔗 לינק לעובדים: employees.html (קבוע!)');
+console.log('');
+
+</script>
+
+</body>
+</html>
